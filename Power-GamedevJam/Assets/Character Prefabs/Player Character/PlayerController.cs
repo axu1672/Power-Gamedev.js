@@ -7,13 +7,14 @@ public class PlayerController : MonoBehaviour
     public Rigidbody2D rb;
     public float bSpeed = 0.1f;
     private Transform trn;
-    private Vector2 PlayerPosition
+    private SpriteRenderer renderer;
+    public Vector2 PlayerPosition
     {
         get
         {
             return new Vector2(trn.position.x, trn.position.y);
         }
-        set
+        private set
         {
             trn.position = new Vector3(value.x, value.y, trn.position.z);
         }
@@ -25,6 +26,7 @@ public class PlayerController : MonoBehaviour
     {
         trn = gameObject.transform;
         rb = GetComponent<Rigidbody2D>();
+        renderer = GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
@@ -52,9 +54,10 @@ public class PlayerController : MonoBehaviour
         else
         {
             HorizontalMovement = Left ? -1 : 1;
+            renderer.flipX = Left;
         }
 
         Vector2 direction = new Vector2(HorizontalMovement, VerticalMovement);
-        rb.velocity = direction;   
+        rb.velocity = direction;
     }
 }
