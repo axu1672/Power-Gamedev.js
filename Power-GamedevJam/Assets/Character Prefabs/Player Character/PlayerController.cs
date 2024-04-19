@@ -8,10 +8,14 @@ public class PlayerController : MonoBehaviour
     public float bSpeed = 0.1f;
     private Transform trn;
     private SpriteRenderer renderer;
+
+    private PartyMemberBaseClass baseClass = null;
+    public List<PartyController> partyMembers = new List<PartyController>();
     public Vector2 PlayerPosition
     {
         get
         {
+            if (trn == null) return new Vector2();
             return new Vector2(trn.position.x, trn.position.y);
         }
         private set
@@ -27,6 +31,16 @@ public class PlayerController : MonoBehaviour
         trn = gameObject.transform;
         rb = GetComponent<Rigidbody2D>();
         renderer = GetComponent<SpriteRenderer>();
+
+        // Default TODO add a way to change this
+        baseClass = new KnightClass_Base();
+        //Init_Renderer(); TODO uncomment this to allow dynamic party leader
+    }
+
+    private void Init_Renderer()
+    {
+        string filename = baseClass.SpriteName;
+        renderer.sprite = Resources.Load<Sprite>(filename);
     }
 
     // Update is called once per frame
@@ -59,5 +73,10 @@ public class PlayerController : MonoBehaviour
 
         Vector2 direction = new Vector2(HorizontalMovement, VerticalMovement);
         rb.velocity = direction;
+
+        foreach (var pm in partyMembers)
+        {
+            pm.SetTarget(PlayerPosition);
+        }
     }
 }

@@ -8,6 +8,17 @@ public class SkeletonNPC : MonoBehaviour, NPCController
     private Transform trn;
     private Rigidbody2D rb;
     private SpriteRenderer renderer;
+    private const int ATTACK_COOLDOWN_FRAMES = 60;
+    private int attackCooldown = 0;
+
+    public bool IsDead
+    {
+        get
+        {// TODO
+            return false;
+        }
+    }
+
     public Vector2 Position
     {
         get
@@ -36,12 +47,51 @@ public class SkeletonNPC : MonoBehaviour, NPCController
     void Update()
     {
         Vector2 dir = MoveTarget - Position;
-        rb.velocity = dir;
+        rb.velocity = dir.normalized * 0.6f;
+        if (attackCooldown > 0)
+            attackCooldown--;
+    }
+
+    private void Attack(GameObject op)
+    {
+        Debug.Log($"Hitting: {op.name} for 1 dmg");
+    }
+
+    void OnCollisionEnter2D(Collision2D c)
+    {
+        if (c.gameObject.name.Contains("Player"))
+        {
+            if (attackCooldown == 0)
+            {
+                Attack(c.gameObject);
+                attackCooldown += ATTACK_COOLDOWN_FRAMES;
+            }
+        }
+    }
+
+    void OnCollisionStay2D(Collision2D c)
+    {
+        if (c.gameObject.name.Contains("Player"))
+        {
+            if (attackCooldown == 0)
+            {
+                Attack(c.gameObject);
+                attackCooldown += ATTACK_COOLDOWN_FRAMES;
+            }
+        }
     }
 }
 
-public interface NPCController 
+public class SkeletonBase
 {
-    public void SetTarget(Vector2 target);
-}
+    private int health = 100;
+    public int Health
+    {
+        get
+        {
+            return health;
+        }
+    }
 
+    
+}
