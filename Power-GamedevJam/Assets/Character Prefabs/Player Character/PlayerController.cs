@@ -11,6 +11,22 @@ public class PlayerController : MonoBehaviour
 
     private PartyMemberBaseClass baseClass = null;
     public List<PartyController> partyMembers = new List<PartyController>();
+
+    private int stamina;
+    public int Stamina
+    {
+        get
+        {
+            return stamina;
+        }
+        set
+        {
+            stamina = value;
+        }
+    }
+
+    private int STAMINA_RECOVERY_DELAY = 0;
+
     public Vector2 PlayerPosition
     {
         get
@@ -35,6 +51,9 @@ public class PlayerController : MonoBehaviour
         // Default TODO add a way to change this
         baseClass = new KnightClass_Base();
         //Init_Renderer(); TODO uncomment this to allow dynamic party leader
+
+        stamina = baseClass.BASE_STAMINA;
+
     }
 
     private void Init_Renderer()
@@ -46,6 +65,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        bool Sprinting = Input.GetKey(KeyCode.LeftShift);
         bool Up = Input.GetKey(KeyCode.W);
         bool Down = Input.GetKey(KeyCode.S);
         bool Left = Input.GetKey(KeyCode.A);
@@ -72,7 +92,19 @@ public class PlayerController : MonoBehaviour
         }
 
         Vector2 direction = new Vector2(HorizontalMovement, VerticalMovement);
-        rb.velocity = direction;
+
+        if (Sprinting && stamina > 0)
+        {
+            rb.velocity = direction.normalized * 2;
+            stamina--;
+            STAMINA_RECOVERY_DELAY = 200;
+        }
+        else
+        {
+            rb.velocity = direction.normalized;
+            if (STAMINA_RECOVERY_DELAY > 0) STAMINA_RECOVERY_DELAY--;
+            if (stamina < baseClass.BASE_STAMINA && STAMINA_RECOVERY_DELAY == 0) stamina ++;
+        }  
 
         foreach (var pm in partyMembers)
         {

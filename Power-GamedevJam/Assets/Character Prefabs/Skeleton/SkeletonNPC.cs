@@ -23,6 +23,7 @@ public class SkeletonNPC : MonoBehaviour, NPCController
     {
         get
         {
+            if (trn == null) return Vector2.negativeInfinity;
             return new Vector2(trn.position.x, trn.position.y);
         }
         private set
@@ -55,11 +56,24 @@ public class SkeletonNPC : MonoBehaviour, NPCController
     private void Attack(GameObject op)
     {
         Debug.Log($"Hitting: {op.name} for 1 dmg");
+        if (op.name.Contains("Player"))
+        {
+            var controller = op.GetComponent<PlayerController>();
+        }
+        else if (op.name.Contains("Party"))
+        {
+            var controller = op.GetComponent<PartyController>();
+            if (controller != null)
+            {
+                Vector2 force = (MoveTarget - Position).normalized * 100;
+                controller.Bump(force);
+            }
+        }
     }
 
     void OnCollisionEnter2D(Collision2D c)
     {
-        if (c.gameObject.name.Contains("Player"))
+        if (c.gameObject.name.Contains("Player") || c.gameObject.name.Contains("Party"))
         {
             if (attackCooldown == 0)
             {
@@ -79,6 +93,11 @@ public class SkeletonNPC : MonoBehaviour, NPCController
                 attackCooldown += ATTACK_COOLDOWN_FRAMES;
             }
         }
+    }
+
+    public void Bump(Vector2 force)
+    {
+
     }
 }
 

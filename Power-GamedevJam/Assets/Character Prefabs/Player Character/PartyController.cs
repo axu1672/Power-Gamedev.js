@@ -17,6 +17,8 @@ public class PartyController : MonoBehaviour, NPCController
     private PartyMember member;
     public PartyMember Member { get { return member; } }
 
+    private int CrowdControlEffectTimer = 0;
+
     public void SetTarget(Vector2 target)
     {
         MoveTarget = target;
@@ -49,15 +51,13 @@ public class PartyController : MonoBehaviour, NPCController
     // Start is called before the first frame update
     void Start()
     {
-       
-
         //gameObject.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (initialized)
+        if (initialized && CrowdControlEffectTimer == 0)
         {
             Vector2 dir = MoveTarget - Position;
             float dist = dir.magnitude;
@@ -72,7 +72,19 @@ public class PartyController : MonoBehaviour, NPCController
                 Debug.DrawLine(Position, MoveTarget, Color.red);
                 rb.velocity = dir * 1.6f;
             }
-        }       
+        }
+        if (CrowdControlEffectTimer > 0)
+            CrowdControlEffectTimer--;
+    }
+
+    public void Bump(Vector2 force)
+    {
+        if (CrowdControlEffectTimer == 0)
+        {
+            rb.velocity = new Vector2();
+            rb.AddForce(force);
+            CrowdControlEffectTimer += 60;
+        }
     }
 }
 
@@ -134,6 +146,7 @@ public enum PartyMemberClass
 
 public abstract class PartyMemberBaseClass 
 {
+    public virtual int BASE_STAMINA => 1000;
     public abstract string SpriteName { get; }
     public virtual int INVINCIBILITY_FRAMES => 100;
     private int health;
